@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>發財的资源站</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- GSAP 动画库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <!-- Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FF6B6B',
+                        secondary: '#4ECDC4',
+                        accent: '#FFD166',
+                        dark: '#2A2D34',
+                        light: '#F7FFF7'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            }
+            .text-shadow-lg {
+                text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+            }
+            .btn-glow {
+                box-shadow: 0 0 5px theme('colors.primary'), 0 0 20px theme('colors.primary');
+            }
+            .btn-glow-secondary {
+                box-shadow: 0 0 5px theme('colors.secondary'), 0 0 20px theme('colors.secondary');
+            }
+            .glass-effect {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            .bg-gradient-anime {
+                background: linear-gradient(135deg, rgba(42, 45, 52, 0.8) 0%, rgba(42, 45, 52, 0.6) 100%);
+            }
+        }
+    </style>
+    <style>
+        body {
+            overflow-x: hidden;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        
+        .bg-slider {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .bg-slider .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+        }
+        
+        .bg-slider .slide.active {
+            opacity: 1;
+        }
+        
+        .bg-slider .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .btn-3d {
+            position: relative;
+            transition: all 0.2s ease;
+            transform-style: preserve-3d;
+        }
+        
+        .btn-3d:before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            bottom: -4px;
+            background-color: rgba(0, 0, 0, 0.2);
+            transform: translateZ(-1px);
+            border-radius: inherit;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-3d:hover {
+            transform: translateY(-3px);
+        }
+        
+        .btn-3d:hover:before {
+            bottom: -7px;
+        }
+        
+        .btn-3d:active {
+            transform: translateY(0);
+        }
+        
+        .btn-3d:active:before {
+            bottom: -2px;
+        }
+        
+        .avatar-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+        }
+        
+        .avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.6);
+        }
+        
+        .avatar-glow {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 107, 107, 0.4) 0%, rgba(255, 107, 107, 0) 70%);
+            z-index: -1;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.4;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background-color: rgba(42, 45, 52, 0.9);
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            padding: 20px;
+            box-shadow: 0 0 30px rgba(78, 205, 196, 0.5);
+            transform: scale(0.8);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal.active .modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+        
+        .form-input {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            padding: 10px;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            border-color: theme('colors.secondary');
+            box-shadow: 0 0 10px theme('colors.secondary');
+            outline: none;
+        }
+        
+        .toggle-btn {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-btn:before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: white;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-btn.active {
+            background-color: theme('colors.secondary');
+        }
+        
+        .toggle-btn.active:before {
+            transform: translateX(26px);
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 640px) {
+            .avatar-container {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .btn-container {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen text-light">
+    <!-- 背景轮播 -->
+    <div class="bg-slider">
+        <div class="slide active">
+            <img src="https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/239e20fe560a4c479aaad996d1491535.png~tplv-a9rns2rl98-24:720:720.png?rcl=20251110154132F72FF805C82D1EF4BF3F&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1763365292&x-signature=q44FqupMTXw9xvyoEcslYKdPu2A%3D" alt="背景图片">
+        </div>
+        <div class="slide">
+            <img src="https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/239e20fe560a4c479aaad996d1491535.png~tplv-a9rns2rl98-24:720:720.png?rcl=20251110154132F72FF805C82D1EF4BF3F&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1763365292&x-signature=q44FqupMTXw9xvyoEcslYKdPu2A%3D" alt="背景图片">
+        </div>
+        <div class="slide">
+            <img src="https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/239e20fe560a4c479aaad996d1491535.png~tplv-a9rns2rl98-24:720:720.png?rcl=20251110154132F72FF805C82D1EF4BF3F&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1763365292&x-signature=q44FqupMTXw9xvyoEcslYKdPu2A%3D" alt="背景图片">
+        </div>
+        <div class="slide">
+            <img src="https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/239e20fe560a4c479aaad996d1491535.png~tplv-a9rns2rl98-24:720:720.png?rcl=20251110154132F72FF805C82D1EF4BF3F&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1763365292&x-signature=q44FqupMTXw9xvyoEcslYKdPu2A%3D" alt="背景图片">
+        </div>
+        <div class="slide">
+            <img src="https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/239e20fe560a4c479aaad996d1491535.png~tplv-a9rns2rl98-24:720:720.png?rcl=20251110154132F72FF805C82D1EF4BF3F&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1763365292&x-signature=q44FqupMTXw9xvyoEcslYKdPu2A%3D" alt="背景图片">
+        </div>
+    </div>
+    
+    <!-- 主内容 -->
+    <div class="container mx-auto px-4 py-8 min-h-screen flex flex-col justify-between relative z-10">
+        <!-- 顶部区域 -->
+        <header class="text-center py-8">
+            <div class="avatar-container animate-float">
+                <div class="avatar-glow"></div>
+                <img src="https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/4431199ad4d442d783514dc481e22acf.png~tplv-a9rns2rl98-24:720:720.png?rcl=20251110154132F72FF805C82D1EF4BF3F&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1763365292&x-signature=T%2BAdXpNZrG65gRFvFO6RsOqc65s%3D" alt="头像" class="avatar">
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold mt-6 text-shadow-lg">發財的资源站</h1>
+            <p class="text-xl mt-2 text-shadow">探索无限可能</p>
+        </header>
+        
+        <!-- 中间按钮区域 -->
+        <main class="flex-grow flex flex-col items-center justify-center">
+            <div class="btn-container grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
+                <!-- 资源分享按钮 -->
+                <a href="https://www.123912.com/s/UgVSVv-F3Fa3" target="_blank" class="btn-3d bg-primary hover:bg-opacity-90 text-white font-bold py-4 px-8 rounded-lg text-center transition-all duration-300 transform hover:scale-105 btn-glow">
+                    <i class="fa fa-share-alt mr-2"></i>资源分享
+                </a>
+                
+                <!-- 实用工具按钮 -->
+                <a href="https://www.123912.com/s/UgVSVv-G3Fa3" target="_blank" class="btn-3d bg-secondary hover:bg-opacity-90 text-white font-bold py-4 px-8 rounded-lg text-center transition-all duration-300 transform hover:scale-105 btn-glow-secondary">
+                    <i class="fa fa-wrench mr-2"></i>实用工具
+                </a>
+                
+                <!-- 源码分享按钮 -->
+                <a href="https://www.123912.com/s/UgVSVv-P3Fa3" target="_blank" class="btn-3d bg-accent hover:bg-opacity-90 text-dark font-bold py-4 px-8 rounded-lg text-center transition-all duration-300 transform hover:scale-105">
+                    <i class="fa fa-code mr-2"></i>源码分享
+                </a>
+                
+                <!-- 跳转交流群按钮 -->
+                <a href="https://qun.qq.com/universal-share/share?ac=1&authKey=27DL%2BO%2F3kGHpabFKSkT%2F16vMPnuSbeMtVB6t2O0OPFxIbUsLV4Rs6FuyISod5gvf&busi_data=eyJncm91cENvZGUiOiI5Nzk3NTAwMDQiLCJ0b2tlbiI6Im40eDVOQjVWcC9FUjB2aGlQSHlHakt4NmtseHR4NTY3N1FWMEZaZ1FrdlJneHlwNXk4cVlqWmhQVHo3OHpGYUIiLCJ1aW4iOiIzMzcyOTkxNTI5In0%3D&data=LfvMSti_QShfyQPrBGmQAbLMYFnYmp2BO_XdaocFWLirLfHe314peIxjLhneBugTlygX2LHIxp1pxMiR9paFcw&svctype=4&tempid=h5_group_info" target="_blank" class="btn-3d bg-blue-500 hover:bg-opacity-90 text-white font-bold py-4 px-8 rounded-lg text-center transition-all duration-300 transform hover:scale-105">
+                    <i class="fa fa-comments mr-2"></i>跳转交流群
+                </a>
+            </div>
+            
+            <!-- 合作找我按钮 -->
+            <div class="mt-8">
+                <a href="https://qm.qq.com/q/h1tTnSoeqs" target="_blank" class="btn-3d bg-purple-500 hover:bg-opacity-90 text-white font-bold py-3 px-6 rounded-lg text-center transition-all duration-300 transform hover:scale-105 flex items-center">
+                    <i class="fa fa-handshake-o mr-2"></i>合作找我
+                </a>
+            </div>
+            
+            <!-- 注册登录按钮 -->
+            <div class="mt-4 flex space-x-4">
+                <button id="loginBtn" class="btn-3d bg-green-500 hover:bg-opacity-90 text-white font-bold py-2 px-4 rounded-lg text-center transition-all duration-300 transform hover:scale-105">
+                    <i class="fa fa-sign-in mr-1"></i>登录
+                </button>
+                <button id="registerBtn" class="btn-3d bg-orange-500 hover:bg-opacity-90 text-white font-bold py-2 px-4 rounded-lg text-center transition-all duration-300 transform hover:scale-105">
+                    <i class="fa fa-user-plus mr-1"></i>注册
+                </button>
+            </div>
+        </main>
+        
+        <!-- 底部区域 -->
+        <footer class="text-center py-6 text-sm text-gray-300">
+            <p>© 2025 發財的资源站 | 本站资源仅供学习交流</p>
+            <p class="mt-2">本站所有内容均来自互联网，如有侵权请联系我们删除</p>
+        </footer>
+    </div>
+    
+    <!-- 登录模态框 -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content glass-effect">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-secondary">用户登录</h2>
+                <button class="close-modal text-gray-400 hover:text-white text-xl">&times;</button>
+            </div>
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label for="loginUsername" class="block mb-1">用户名</label>
+                    <input type="text" id="loginUsername" class="form-input w-full" placeholder="请输入用户名" required>
+                </div>
+                <div>
+                    <label for="loginPassword" class="block mb-1">密码</label>
+                    <input type="password" id="loginPassword" class="form-input w-full" placeholder="请输入密码" required>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="remember" class="mr-2">
+                        <label for="remember">记住我</label>
+                    </div>
+                    <a href="#" class="text-secondary hover:underline">忘记密码？</a>
+                </div>
+                <button type="submit" class="btn-3d bg-secondary hover:bg-opacity-90 text-white font-bold py-2 px-4 rounded-lg w-full transition-all duration-300">
+                    登录
+                </button>
+                <div class="text-center mt-4">
+                    <p>还没有账号？ <button type="button" id="switchToRegister" class="text-secondary hover:underline">立即注册</button></p>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 注册模态框 -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content glass-effect">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-primary">用户注册</h2>
+                <button class="close-modal text-gray-400 hover:text-white text-xl">&times;</button>
+            </div>
+            <form id="registerForm" class="space-y-4">
+                <div>
+                    <label for="registerUsername" class="block mb-1">用户名</label>
+                    <input type="text" id="registerUsername" class="form-input w-full" placeholder="请输入用户名" required>
+                </div>
+                <div>
+                    <label for="registerEmail" class="block mb-1">邮箱</label>
+                    <input type="email" id="registerEmail" class="form-input w-full" placeholder="请输入邮箱" required>
+                </div>
+                <div>
+                    <label for="registerPassword" class="block mb-1">密码</label>
+                    <input type="password" id="registerPassword" class="form-input w-full" placeholder="请输入密码" required>
+                </div>
+                <div>
+                    <label for="registerConfirmPassword" class="block mb-1">确认密码</label>
+                    <input type="password" id="registerConfirmPassword" class="form-input w-full" placeholder="请再次输入密码" required>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="agreeTerms" class="mr-2" required>
+                    <label for="agreeTerms">我已阅读并同意 <a href="#" class="text-secondary hover:underline">用户协议</a> 和 <a href="#" class="text-secondary hover:underline">隐私政策</a></label>
+                </div>
+                <button type="submit" class="btn-3d bg-primary hover:bg-opacity-90 text-white font-bold py-2 px-4 rounded-lg w-full transition-all duration-300">
+                    注册
+                </button>
+                <div class="text-center mt-4">
+                    <p>已有账号？ <button type="button" id="switchToLogin" class="text-primary hover:underline">立即登录</button></p>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // 背景轮播功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const slides = document.querySelectorAll('.bg-slider .slide');
+            let currentSlide = 0;
+            
+            function showSlide(index) {
+                slides.forEach(slide => {
+                    slide.classList.remove('active');
+                });
+                
+                // 使用GSAP添加淡入淡出动画
+                gsap.to(slides[index], {
+                    opacity: 1,
+                    duration: 1.5,
+                    onStart: function() {
+                        slides[index].classList.add('active');
+                    }
+                });
+            }
+            
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % slides.length;
+                showSlide(currentSlide);
+            }
+            
+            // 初始显示第一张幻灯片
+            showSlide(0);
+            
+            // 设置定时器，每5秒切换一次幻灯片
+            setInterval(nextSlide, 5000);
+            
+            // 模态框功能
+            const loginModal = document.getElementById('loginModal');
+            const registerModal = document.getElementById('registerModal');
+            const loginBtn = document.getElementById('loginBtn');
+            const registerBtn = document.getElementById('registerBtn');
+            const closeButtons = document.querySelectorAll('.close-modal');
+            const switchToRegister = document.getElementById('switchToRegister');
+            const switchToLogin = document.getElementById('switchToLogin');
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            
+            // 打开登录模态框
+            loginBtn.addEventListener('click', function() {
+                loginModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+            
+            // 打开注册模态框
+            registerBtn.addEventListener('click', function() {
+                registerModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+            
+            // 关闭模态框
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    loginModal.classList.remove('active');
+                    registerModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                });
+            });
+            
+            // 切换到注册
+            switchToRegister.addEventListener('click', function(e) {
+                e.preventDefault();
+                loginModal.classList.remove('active');
+                setTimeout(() => {
+                    registerModal.classList.add('active');
+                }, 300);
+            });
+            
+            // 切换到登录
+            switchToLogin.addEventListener('click', function(e) {
+                e.preventDefault();
+                registerModal.classList.remove('active');
+                setTimeout(() => {
+                    loginModal.classList.add('active');
+                }, 300);
+            });
+            
+            // 点击模态框外部关闭
+            window.addEventListener('click', function(e) {
+                if (e.target === loginModal) {
+                    loginModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+                if (e.target === registerModal) {
+                    registerModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+            
+            // 登录表单提交
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const username = document.getElementById('loginUsername').value;
+                const password = document.getElementById('loginPassword').value;
+                
+                // 这里可以添加登录验证逻辑
+                alert(`登录请求已提交\n用户名: ${username}`);
+                
+                // 模拟登录成功
+                loginModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                
+                // 更新登录状态
+                updateAuthUI(true, username);
+            });
+            
+            // 注册表单提交
+            registerForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const username = document.getElementById('registerUsername').value;
+                const email = document.getElementById('registerEmail').value;
+                const password = document.getElementById('registerPassword').value;
+                const confirmPassword = document.getElementById('registerConfirmPassword').value;
+                
+                // 简单的表单验证
+                if (password !== confirmPassword) {
+                    alert('两次输入的密码不一致');
+                    return;
+                }
+                
+                // 这里可以添加注册逻辑
+                alert(`注册请求已提交\n用户名: ${username}\n邮箱: ${email}`);
+                
+                // 模拟注册成功
+                registerModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                
+                // 自动填充登录表单并打开登录模态框
+                document.getElementById('loginUsername').value = username;
+                setTimeout(() => {
+                    loginModal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }, 500);
+            });
+            
+            // 更新认证UI
+            function updateAuthUI(isLoggedIn, username) {
+                const authContainer = document.querySelector('.mt-4.flex.space-x-4');
+                
+                if (isLoggedIn) {
+                    // 已登录状态
+                    authContainer.innerHTML = `
+                        <div class="flex items-center">
+                            <span class="mr-2">欢迎, ${username}</span>
+                            <button id="logoutBtn" class="btn-3d bg-red-500 hover:bg-opacity-90 text-white font-bold py-2 px-4 rounded-lg text-center transition-all duration-300 transform hover:scale-105">
+                                <i class="fa fa-sign-out mr-1"></i>退出
+                            </button>
+                        </div>
+                    `;
+                    
+                    // 添加退出按钮事件
+                    document.getElementById('logoutBtn').addEventListener('click', function() {
+                        updateAuthUI(false);
+                    });
+                } else {
+                    // 未登录状态
+                    authContainer.innerHTML = `
+                        <button id="loginBtn" class="btn-3d bg-green-500 hover:bg-opacity-90 text-white font-bold py-2 px-4 rounded-lg text-center transition-all duration-300 transform hover:scale-105">
+                            <i class="fa fa-sign-in mr-1"></i>登录
+                        </button>
+                        <button id="registerBtn" class="btn-3d bg-orange-500 hover:bg-opacity-90 text-white font-bold py-2 px-4 rounded-lg text-center transition-all duration-300 transform hover:scale-105">
+                            <i class="fa fa-user-plus mr-1"></i>注册
+                        </button>
+                    `;
+                    
+                    // 重新添加登录和注册按钮事件
+                    document.getElementById('loginBtn').addEventListener('click', function() {
+                        loginModal.classList.add('active');
+                        document.body.style.overflow = 'hidden';
+                    });
+                    
+                    document.getElementById('registerBtn').addEventListener('click', function() {
+                        registerModal.classList.add('active');
+                        document.body.style.overflow = 'hidden';
+                    });
+                }
+            }
+            
+            // 添加按钮悬停效果
+            const buttons = document.querySelectorAll('.btn-3d');
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    gsap.to(this, {
+                        scale: 1.05,
+                        duration: 0.2
+                    });
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    gsap.to(this, {
+                        scale: 1,
+                        duration: 0.2
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
